@@ -438,7 +438,7 @@ def seed_data():
     if User.query.first():
         return  # already seeded
 
-    faculty1 = User(username="faculty1", name="Prof. Mehta", role="faculty")
+    faculty1 = User(username="Bhagyashree", name="Asst. Prof. Bhagyashree Kulkarni", role="faculty")
     faculty1.set_password("pass123")
     db.session.add(faculty1)
     db.session.commit()
@@ -452,8 +452,8 @@ def seed_data():
     db.session.commit()
 
     students_data = [
-        ("student1", "Yash Swain", "TYIT01"),
-        ("student2", "Rajdatt Sawant", "TYIT02"),
+        ("Yash", "Yash Swain", "TYIT01"),
+        ("Rajdatt", "Rajdatt Sawant", "TYIT02"),
     ]
     students = []
     for uname, name, roll in students_data:
