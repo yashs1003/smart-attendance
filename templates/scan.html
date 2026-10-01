@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Scan QR{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>Scan the Lecture QR Code</h2>
+  <div id="reader" style="width: 320px; max-width: 100%;"></div>
+  <p id="scan-result" class="muted"></p>
+  <p class="muted" id="camera-hint">If your browser asks for camera permission, tap Allow. On first visit you may also see a "connection not private" warning — that's expected (self-signed certificate) — tap Advanced → Proceed to continue.</p>
+
+  <hr>
+  <p class="muted">Camera not available? Enter the code shown under the QR manually:</p>
+  <form id="manual-form">
+    <input type="text" id="manual-token" placeholder="Paste / type the code">
+    <button type="submit" class="btn btn-primary">Mark Attendance</button>
+  </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<script>
+async function submitToken(token) {
+  const res = await fetch("{{ url_for('mark_attendance') }}", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({token: token})
+  });
+  const data = await res.json();
+  const el = document.getElementById('scan-result');
+  el.textContent = data.message;
+  el.className = data.ok ? "text-ok" : "text-danger";
+}
+
+document.getElementById('manual-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const token = document.getElementById('manual-token').value.trim();
+  if (token) submitToken(token);
+});
+
+// Camera scanning (works when the browser has camera access, e.g. on a phone)
+try {
+  const qrScanner = new Html5Qrcode("reader");
+  Html5Qrcode.getCameras().then(cameras => {
+    if (cameras && cameras.length) {
+      qrScanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 220 },
+        (decodedText) => { submitToken(decodedText); },
+        () => {}
+      );
+    } else {
+      document.getElementById('reader').innerHTML = "<p class='muted'>No camera found — use manual entry below.</p>";
+    }
+  }).catch(() => {
+    document.getElementById('reader').innerHTML = "<p class='muted'>Camera unavailable — use manual entry below.</p>";
+  });
+} catch (e) {
+  document.getElementById('reader').innerHTML = "<p class='muted'>Camera unavailable — use manual entry below.</p>";
+}
+</script>
+{% endblock %}

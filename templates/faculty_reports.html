@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<h2>{{ subject.name }} — Reports</h2>
+
+<h3>Overall Attendance</h3>
+<table class="data-table">
+  <thead><tr><th>Roll No</th><th>Name</th><th>Attended</th><th>Total</th><th>%</th><th>Status</th></tr></thead>
+  <tbody>
+    {% for r in rows %}
+    <tr>
+      <td>{{ r.student.roll_no }}</td>
+      <td>{{ r.student.name }}</td>
+      <td>{{ r.attended }}</td>
+      <td>{{ r.total }}</td>
+      <td>{{ r.pct }}%</td>
+      <td>{% if r.low %}<span class="text-danger">⚠️ Low</span>{% else %}<span class="text-ok">OK</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h3>Monthly Breakdown</h3>
+{% for month, data in monthly.items() %}
+<div class="card">
+  <h4>{{ month }} ({{ data.total_lectures }} lectures held)</h4>
+  <table class="data-table">
+    <thead><tr><th>Student</th><th>Attended</th><th>%</th></tr></thead>
+    <tbody>
+      {% for student in students %}
+      <tr>
+        <td>{{ student.name }}</td>
+        <td>{{ data.by_student[student.id] }}</td>
+        <td>{{ ((data.by_student[student.id] / data.total_lectures * 100) | round(1)) if data.total_lectures else 0 }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="muted">No lectures held yet.</p>
+{% endfor %}
+{% endblock %}

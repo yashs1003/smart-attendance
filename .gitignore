@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+attendance.db
+.venv/
+venv/
+.env

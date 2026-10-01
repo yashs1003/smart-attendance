@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Live Lecture{% endblock %}
+{% block content %}
+<div class="card qr-card">
+  <h2>{{ lecture.subject.name }}</h2>
+  <p class="muted">Lecture started {{ lecture.started_at.strftime('%d %b %Y, %H:%M') }}</p>
+
+  <div id="qr-wrap">
+    <img id="qr-img" src="" alt="QR Code" width="260" height="260">
+  </div>
+
+  <p>New code in <span id="countdown">--</span>s — students must rescan each refresh.</p>
+  <p><strong><span id="present-count">{{ present_count }}</span> / {{ total_enrolled }}</strong> students marked present</p>
+
+  <form method="POST" action="{{ url_for('end_lecture', lecture_id=lecture.id) }}">
+    <button type="submit" class="btn btn-danger">End Lecture</button>
+  </form>
+</div>
+
+<script>
+const lectureId = {{ lecture.id }};
+const refreshSeconds = {{ refresh_seconds }};
+
+async function pollQr() {
+  const res = await fetch(`/faculty/lecture/${lectureId}/qr_data`);
+  const data = await res.json();
+  if (!data.is_active) {
+    document.getElementById('qr-wrap').innerHTML = "<p>Lecture ended.</p>";
+    return;
+  }
+  document.getElementById('qr-img').src = data.qr_image;
+  document.getElementById('present-count').textContent = data.present_count;
+  document.getElementById('countdown').textContent = data.seconds_left;
+}
+
+pollQr();
+setInterval(pollQr, 2000); // poll every 2s so the countdown + attendee count stay live
+</script>
+{% endblock %}

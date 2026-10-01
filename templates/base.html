@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Smart Attendance{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<nav class="navbar">
+  <div class="brand">🎓 Smart Attendance</div>
+  <div class="nav-links">
+    {% if current_user.is_authenticated %}
+      {% if current_user.role == 'student' %}
+        <a href="{{ url_for('student_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('scan_page') }}">Scan QR</a>
+        <a href="{{ url_for('student_history') }}">History</a>
+        <a href="{{ url_for('student_monthly_report') }}">Monthly Report</a>
+      {% else %}
+        <a href="{{ url_for('faculty_dashboard') }}">Dashboard</a>
+      {% endif %}
+      <span class="user-chip">{{ current_user.name }} ({{ current_user.role }})</span>
+      <a href="{{ url_for('logout') }}">Logout</a>
+    {% endif %}
+  </div>
+</nav>
+<main class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

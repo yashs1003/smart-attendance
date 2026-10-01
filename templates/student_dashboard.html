@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard{% endblock %}
+{% block content %}
+<h2>Welcome, {{ current_user.name }}</h2>
+
+<div class="card overall-card">
+  <p class="muted">Overall Attendance</p>
+  <h1>{{ overall }}%</h1>
+</div>
+
+{% if low_subjects %}
+<div class="card banner-danger">
+  ⚠️ Low attendance warning: you are below {{ threshold }}% in
+  {% for s in low_subjects %}<strong>{{ s.subject.name }}</strong>{% if not loop.last %}, {% endif %}{% endfor %}.
+</div>
+{% endif %}
+
+<h3>Subject-wise Attendance</h3>
+<div class="grid">
+  {% for s in stats %}
+  <div class="card">
+    <h4>{{ s.subject.name }}</h4>
+    <p class="muted">{{ s.attended }} / {{ s.total }} lectures attended</p>
+    <div class="progress-bar">
+      <div class="progress-fill {% if s.low %}fill-danger{% else %}fill-ok{% endif %}" style="width: {{ s.percentage }}%;"></div>
+    </div>
+    <p class="{% if s.low %}text-danger{% else %}text-ok{% endif %}"><strong>{{ s.percentage }}%</strong></p>
+  </div>
+  {% endfor %}
+</div>
+
+<a href="{{ url_for('scan_page') }}" class="btn btn-primary btn-large">📷 Scan QR to Mark Attendance</a>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Faculty Dashboard{% endblock %}
+{% block content %}
+<h2>Your Subjects</h2>
+
+{% if active_lecture %}
+<div class="card banner-warning">
+  A lecture for <strong>{{ active_lecture.subject.name }}</strong> is currently live.
+  <a href="{{ url_for('run_lecture', lecture_id=active_lecture.id) }}" class="btn btn-small">Resume it</a>
+</div>
+{% endif %}
+
+<div class="grid">
+  {% for subject in subjects %}
+  <div class="card">
+    <h3>{{ subject.name }}</h3>
+    <p class="muted">{{ subject.code }}</p>
+    <form method="POST" action="{{ url_for('start_lecture', subject_id=subject.id) }}">
+      <button type="submit" class="btn btn-primary" {% if active_lecture %}disabled{% endif %}>Start Lecture (QR)</button>
+    </form>
+    <a href="{{ url_for('faculty_reports', subject_id=subject.id) }}" class="btn btn-secondary">View Reports</a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
